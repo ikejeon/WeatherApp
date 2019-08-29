@@ -1,14 +1,10 @@
 package com.example.weatherapplication
 
 import android.app.Activity
-import android.content.Context
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : Activity(), MvpInterface.View {
@@ -23,7 +19,7 @@ class MainActivity : Activity(), MvpInterface.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        presenter = WeatherPresenter(this)
+        presenter = WeatherPresenter()
 
         val cityWeather1 = WeatherData("San Francisco", "US")
         val cityWeather2 = WeatherData("New York", "US")
@@ -41,8 +37,8 @@ class MainActivity : Activity(), MvpInterface.View {
                 recyclerView = findViewById<RecyclerView>(R.id.recycler_view).apply {
                     setHasFixedSize(true)
                     layoutManager = LinearLayoutManager(this@MainActivity)
-                    adapter = WeatherAdapter(weatherDataList,this@MainActivity)
-                    Toast.makeText(this@MainActivity,"${weatherDataList[0].humidity}", Toast.LENGTH_LONG).show()
+                    adapter = WeatherAdapter(weatherDataList, this@MainActivity)
+                    Toast.makeText(this@MainActivity, "${weatherDataList[0].humidity}", Toast.LENGTH_LONG).show()
                 }
             })
         }).start()

@@ -1,16 +1,13 @@
 package com.example.weatherapplication
 
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import com.squareup.picasso.Picasso
 
-class WeatherDetailActivity: AppCompatActivity() {
+class WeatherDetailActivity : AppCompatActivity() {
     private var nameView: TextView? = null
     private var temperatureView: TextView? = null
     private var temperatureHighLowView: TextView? = null
@@ -34,7 +31,7 @@ class WeatherDetailActivity: AppCompatActivity() {
 
         nameView?.text = weatherData.cityName
         temperatureView?.text = weatherData.temperature
-        temperatureHighLowView?.text = "${weatherData.temp_high + " / "+weatherData.temp_low}"
+        temperatureHighLowView?.text = "${weatherData.temp_high + " / " + weatherData.temp_low}"
         precipView?.text = weatherData.humidity
 
         val iconUrl = weatherData.iconURL

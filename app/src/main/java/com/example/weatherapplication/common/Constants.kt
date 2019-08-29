@@ -5,5 +5,7 @@ object Constants {
     const val BASE_URL = "http://api.openweathermap.org/"
     const val KELVIN_TO_F = 273.15
     const val TEMPERATURE_CONST = 32
+    const val ICON_PATH = "/img/w/"
+    const val ICON_EXTENSION = ".png"
 
 }
