@@ -1,105 +1,111 @@
 package com.example.weatherapplication
 
 import android.util.Log
-import com.beust.klaxon.JsonObject
-import com.beust.klaxon.Parser
-import com.example.weatherapplication.WeatherDataManager
 import com.example.weatherapplication.common.Constants.API_KEY
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
-
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 import org.json.JSONObject
-import retrofit2.adapter.rxjava2.Result.response
-import android.R.string
-import com.beust.klaxon.JsonReader
-import com.beust.klaxon.Klaxon
-import com.google.gson.JsonParser
-import java.io.StringReader
+import com.example.weatherapplication.common.Constants.KELVIN_TO_F
+import com.example.weatherapplication.common.Constants.TEMPERATURE_CONST
+import com.google.gson.JsonArray
+import org.json.JSONArray
+import java.util.*
 
 
 class WeatherPresenter(_view: MvpInterface.View): MvpInterface {
 
     private var view = _view
-    private var parser = Parser()
 
     val getWeatherData by lazy {
         GetData.loadData()
     }
 
-    fun requestDataFromServer() {
-        val gson = Gson()
-       getWeatherData.getWeatherData("London", API_KEY)
-           .enqueue{
-               onResponse = {
+    fun requestDataFromServer(weatherDataInput:  MutableList<WeatherData>, weatherDataOutput: MutableList<WeatherData>) /*: MutableList<WeatherData>*/{
+        val iterate = weatherDataInput.listIterator()
+//        while (iterate.hasNext()) {
+//        for (i in 0..weatherDataInput.size-1) {
+        for (cityInfo in weatherDataInput) {
+//        weatherDataInput.iterator().forEach {cityInfo->
+//            val cityInfo = iterate.next()
+            val it  = getWeatherData.getWeatherData(cityInfo.cityName, API_KEY)
+                .execute()
+            Log.d("Result", "${it.isSuccessful()}")
 
-                   Log.d("Result", "${it.isSuccessful()}")
-                   Log.d("Result", "${it.body()?.string()}")
-                   Log.d("Result", "${it.headers()}")
-                   Log.d("Result", "${it.message()}")
-                   Log.d("Result", "${it.raw()}")
-//                   Log.d("HERER", )
+            val json = JSONObject(it.body()?.string())
+            val main  =JSONObject(json.get("main")?.toString())
+            val weatherArray = json.getJSONArray("weather")
+            val weatherIcon = JSONObject(weatherArray.get(0).toString());
 
+            val iconSb = StringBuilder("http://openweathermap.org/img/w/")
+            iconSb.append(weatherIcon.get("icon"))
+            iconSb.append(".png")
+            cityInfo.iconURL = iconSb.toString()
 
-
-//                   val ss = Klaxon()
-//                       .parseJsonObject(StringReader(it.body()!!.string()))
-
-//                   println(ss)
-                   val temp = JsonParser().parse(it.body()!!.string())
-                   print(temp);
-                   val json = JSONObject(it.body()?.string())
-                   println(json);
-
-
-//                   val json = it.body()?.string()
-//                   val gson = GsonBuilder().setPrettyPrinting().create()
+                   val temperature = kelvinToF(main.get("temp"))
+                   val temperature_high = kelvinToF(main.get("temp_max"))
+                   val temperature_low = kelvinToF(main.get("temp_min"))
+                   val humidity = main.get("humidity").toString()
+//                   val icon = weatherDetail.get("icon")
+                   val id = json.get("id")
+//                   iterate
+                    cityInfo.temp_high = temperature_high
+                    cityInfo.temp_low = temperature_low
+                    cityInfo.temperature = temperature
+                    cityInfo.humidity = humidity
+//                   println(icon)
+//                   println(id)
+////                   weatherDataOutput.add(cityInfo)
 //
-//                   println("=== Map from JSON ===")
-//                   var personMap: Map<String, Any> = gson.fromJson(json, object : TypeToken<Map<String, Any>>() {}.type)
-////                   personMap.forEach { println(it) }
 //
-//                   println("=== Map to JSON ===")
-//                   val jsonPersonMap: String = gson.toJson(personMap)
-//                   println(jsonPersonMap)
-               }
-               onFailure = {
-                   Log.d("Error", "There are ${it} issue")
+//               }
+//               onFailure = {
+//                   Log.d("Error", "There are ${it} issue")
+//
+//               }
+//           }
+                }
+        }
 
-               }
-           }
+//    }
+//    fun onResponse(call: Call<List<Change>>, response: Response<List<Change>>) {
+//        if (response.isSuccessful) {
+//            val changesList = response.body()
+//            changesList!!.forEach { change -> System.out.println(change.subject) }
+//        } else {
+//            println(response.errorBody())
+//        }
+//    }
+//
+//    fun onFailure(call: Call<List<Change>>, t: Throwable) {
+//        t.printStackTrace()
+//    }
 
+//   fun<T> Call<T>.execute(callback: CallBackKt<T>.() -> Unit) {
+//       val callBackKt = CallBackKt<T>()
+//       callback.invoke(callBackKt)
+//       this.execute()
+//   }
+
+//    class CallBackKt<T>: Callback<T> {
+//
+//       var onResponse: ((Response<T>) -> Unit)? = null
+//       var onFailure: ((t: Throwable?) -> Unit)? = null
+//
+//       override fun onFailure(call: Call<T>, t: Throwable) {
+//           onFailure?.invoke(t)
+//       }
+//
+//       override fun onResponse(call: Call<T>, response: Response<T>) {
+//           onResponse?.invoke(response)
+//       }
+//
+//   }
+    fun kelvinToF(kelvin: Any): String{
+        val kelvinToDouble = kelvin as Double
+        val toF = "%.1f".format(kelvinToDouble.minus(KELVIN_TO_F)*9/5 +TEMPERATURE_CONST)
+        return "${toF}${0x00B0.toChar()}F"
     }
 
-   fun<T> Call<T>.enqueue(callback: CallBackKt<T>.() -> Unit) {
-       val callBackKt = CallBackKt<T>()
-       callback.invoke(callBackKt)
-       this.enqueue(callBackKt)
-   }
-
-               class CallBackKt<T>: Callback<T> {
-
-           var onResponse: ((Response<T>) -> Unit)? = null
-           var onFailure: ((t: Throwable?) -> Unit)? = null
-
-           override fun onFailure(call: Call<T>, t: Throwable) {
-               onFailure?.invoke(t)
-           }
-
-           override fun onResponse(call: Call<T>, response: Response<T>) {
-               onResponse?.invoke(response)
-           }
-
-       }
-
 }
+
 
 
