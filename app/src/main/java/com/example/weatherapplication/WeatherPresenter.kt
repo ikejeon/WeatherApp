@@ -6,7 +6,7 @@ import com.example.weatherapplication.common.Constants.KELVIN_TO_F
 import com.example.weatherapplication.common.Constants.TEMPERATURE_CONST
 import org.json.JSONObject
 
-
+//NEVER USED WITH NEW IMPLEMENTATIONz
 class WeatherPresenter {
 
 
@@ -14,12 +14,8 @@ class WeatherPresenter {
         GetData.loadData()
     }
 
-    fun requestDataFromServer(
-        weatherDataInput: MutableList<WeatherData>,
-        weatherDataOutput: MutableList<WeatherData>
-    ) {
+    fun requestDataFromServer(cityInfo: WeatherData) {
 
-        for (cityInfo in weatherDataInput) {
             val it = getWeatherData.getWeatherData(cityInfo.cityName, API_KEY)
                 .execute()
 
@@ -46,7 +42,7 @@ class WeatherPresenter {
             cityInfo.temperature = temperature
             cityInfo.humidity = humidity
         }
-    }
+
 
     fun kelvinToF(kelvin: Any): String {
         val kelvinToDouble = kelvin as Double

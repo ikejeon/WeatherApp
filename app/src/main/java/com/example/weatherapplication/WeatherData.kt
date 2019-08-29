@@ -14,5 +14,5 @@ data class WeatherData(val cityName: String, val countryCode: String) {
 
     lateinit var humidity: String
 
-    lateinit var iconURL: String
+    var iconURL: String = "a"
 }

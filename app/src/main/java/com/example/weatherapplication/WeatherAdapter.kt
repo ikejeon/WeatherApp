@@ -3,6 +3,7 @@ package com.example.weatherapplication
 import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
@@ -54,6 +55,14 @@ class WeatherAdapter(
             intent.putExtra("city", gson.toJson(weatherDataList[position]))
             context.startActivity(intent)
         }
+
+        //      Set long click listener to delete item on long individual item click
+        holder.itemView.setLongClickable(true)
+        holder.itemView.setOnLongClickListener(View.OnLongClickListener {
+            weatherDataList.removeAt(position)
+            notifyDataSetChanged()
+            false
+        })
     }
 
     override fun getItemCount() = weatherDataList.size
